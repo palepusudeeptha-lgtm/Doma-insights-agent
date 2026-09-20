@@ -1,0 +1,14 @@
+# Phase 1
+pandas
+openpyxl
+
+# Phase 2
+duckdb
+
+# Phase 3
+streamlit
+plotly
+
+# Phase 5
+anthropic
+python-dotenv
