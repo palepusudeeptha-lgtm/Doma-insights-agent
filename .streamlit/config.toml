@@ -1,0 +1,9 @@
+[theme]
+# Only primaryColor is set here -- it's what drives Streamlit's own
+# theme-colored widgets (progress bars, sliders, checkboxes, radio buttons,
+# type="primary" buttons) that app.py's CSS doesn't already override.
+# Background/text/card colors are deliberately left alone: app.py's CSS
+# block already controls those explicitly and comprehensively, so setting
+# them here too would just be a second, harder-to-find source of truth for
+# the same values.
+primaryColor = "#4F6FA8"

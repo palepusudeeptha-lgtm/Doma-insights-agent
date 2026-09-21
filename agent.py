@@ -180,9 +180,26 @@ RULES:
 - "follow_up_questions": exactly 2-3 short, natural next questions a
   business user might ask given THIS specific question and result -- not
   generic questions. Reference actual entities visible in the rows (vendor
-  names, states, exception types, lenders, etc.) where relevant. Each must
-  be answerable as a single SQL query against the title_orders/vendors
-  schema (no follow-up that itself asks "why").
+  names, states, exception types, lenders, etc.) where relevant, using the
+  EXACT values as they literally appear in the rows given to you -- never
+  paraphrase, translate, or expand them (e.g. if a row says state = "VA",
+  write "VA" in the follow-up, not "Virginia"; the follow-up will be
+  re-run as a fresh SQL query against the raw data, so a humanized or
+  reworded value won't match anything and the query will silently return
+  zero rows). Each must be answerable as a single SQL query against the
+  title_orders/vendors schema (no follow-up that itself asks "why").
+  CRITICAL: whichever
+  follow-up gets clicked will be run as a brand-new, standalone question
+  with NO memory of this conversation or these results -- so every
+  follow-up must be fully self-contained. Never write "this trend", "this
+  correlation", "that pattern", "it", "the above", "compared to before",
+  or any other reference back to what was just discussed; spell out the
+  actual metric, entity, and time period instead (write "Does SLA
+  compliance vary by vendor for Manual Review orders in 2026?", not "Does
+  this hold for other decision types?"). If a natural follow-up can only
+  be phrased as a reference to the prior answer, replace it with a
+  different, fully self-contained question instead of forcing the
+  referential phrasing.
 - Do not repeat the raw SQL back -- it's already shown separately.
 """
 

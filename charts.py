@@ -20,6 +20,13 @@ DASHBOARD_CARD_HEIGHT = 245
 # wider under the CSS-swapped font than Plotly reserved room for.
 CHART_FONT = "IBM Plex Sans, system-ui, sans-serif"
 
+# Matches app.py's ACCENT -- keep both in sync. A softened, warm-leaning blue
+# instead of Plotly/Streamlit's more vivid default, to suit the warm-neutral
+# background. _LIGHT is used only where a second series overlays the bars
+# (the SLA % line) and needs to read as a distinct trace, not a new hue.
+CHART_ACCENT = "#4F6FA8"
+CHART_ACCENT_LIGHT = "#93AAC9"
+
 
 def order_volume_sla_chart(con, where_sql: str, params: list):
     """Bar chart of monthly order volume with SLA compliance % as a line overlay."""
@@ -30,10 +37,11 @@ def order_volume_sla_chart(con, where_sql: str, params: list):
     sla = [r[2] for r in rows]
 
     fig = go.Figure()
-    fig.add_bar(x=months, y=volumes, name="Order Volume", yaxis="y1")
+    fig.add_bar(x=months, y=volumes, name="Order Volume", yaxis="y1", marker_color=CHART_ACCENT)
     fig.add_trace(
         go.Scatter(
-            x=months, y=sla, name="SLA Compliance %", yaxis="y2", mode="lines+markers"
+            x=months, y=sla, name="SLA Compliance %", yaxis="y2", mode="lines+markers",
+            line=dict(color=CHART_ACCENT_LIGHT, width=2), marker=dict(color=CHART_ACCENT_LIGHT),
         )
     )
     fig.update_layout(
@@ -61,6 +69,7 @@ def tat_by_decision_chart(con, where_sql: str, params: list):
             orientation="h",
             text=[f"{v:.1f}" for v in values],
             textposition="outside",
+            marker_color=CHART_ACCENT,
         )
     )
     fig.update_layout(
@@ -167,7 +176,10 @@ def auto_chart(columns: list, rows: list):
         labels = [row[0] for row in rows]
         values = [row[1] for row in rows]
         fig = go.Figure(
-            go.Scatter(x=labels, y=values, mode="lines+markers", line=dict(width=2), marker=dict(size=8))
+            go.Scatter(
+                x=labels, y=values, mode="lines+markers",
+                line=dict(width=2, color=CHART_ACCENT), marker=dict(size=8, color=CHART_ACCENT),
+            )
         )
         fig.update_layout(
             xaxis_title=columns[0],
@@ -187,6 +199,7 @@ def auto_chart(columns: list, rows: list):
                 orientation="h",
                 text=[f"{v:,.2f}" if isinstance(v, float) else f"{v:,}" for v in values],
                 textposition="outside",
+                marker_color=CHART_ACCENT,
             )
         )
         fig.update_layout(

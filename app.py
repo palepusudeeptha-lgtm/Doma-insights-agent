@@ -24,41 +24,51 @@ TEXT_PRIMARY = "#1C1917"
 TEXT_BODY = "#44403C"
 TEXT_SECONDARY = "#6B6459"
 TEXT_TERTIARY = "#8B8377"
-ACCENT = "#2563EB"
+ACCENT = "#4F6FA8"  # softened, warm-leaning blue -- was a more vivid #2563EB
+ACCENT_TINT_BG = "#F0F3F8"  # pale tint of ACCENT, for pills
+ACCENT_TINT_BORDER = "#DCE3EE"
 SUCCESS = "#15803D"
 DANGER = "#B42318"
 ICON_BG = "#F1EDE5"
 ICON_COLOR = "#1C1917"
+# Header card only: a bold gradient hero treatment, deliberately darker than
+# the rest of the page's restrained palette -- title/subtitle/filter labels
+# switch to light/white text here (see .st-key-header_card rules below).
+HEADER_GRADIENT = "linear-gradient(120deg, #15213C 0%, #213E6E 45%, #3D5D94 75%, #4F6FA8 100%)"
+HEADER_TEXT_PRIMARY = "#FFFFFF"
+HEADER_TEXT_SECONDARY = "rgba(255, 255, 255, 0.80)"
+LABEL_FONT_SIZE = "15px"  # shared by KPI card labels, chart titles, and the 5 filter labels
+KPI_CHART_TITLE_WEIGHT = "700"  # KPI card titles and chart titles share this weight too
 
 _ARROW_UP = '<svg width="9" height="9" viewBox="0 0 10 10" fill="currentColor"><path d="M5 1l4 6H1z"/></svg>'
 _ARROW_DOWN = '<svg width="9" height="9" viewBox="0 0 10 10" fill="currentColor"><path d="M5 9L1 3h8z"/></svg>'
 
 # Single-weight line icons (no per-card color) -- replaces the earlier emoji set.
 _ICON_TOTAL_ORDERS = (
-    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '
+    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '
     'stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/>'
     '<path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></svg>'
 )
 _ICON_SLA = (
-    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '
+    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '
     'stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>'
 )
 _ICON_CLOCK = (
-    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '
+    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '
     'stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>'
 )
 _ICON_GEAR = (
-    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '
+    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '
     'stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/>'
     '<path d="M12 3.5v2M12 18.5v2M20.5 12h-2M5.5 12h-2M17.8 6.2l-1.4 1.4M7.6 16.4l-1.4 1.4M17.8 17.8l-1.4-1.4M7.6 7.6L6.2 6.2"/></svg>'
 )
 _ICON_ALERT = (
-    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '
+    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '
     'stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5l9 15.5H3l9-15.5z"/><path d="M12 10v3.2"/>'
     '<circle cx="12" cy="16.6" r="0.9" fill="currentColor" stroke="none"/></svg>'
 )
 _ICON_SAVINGS = (
-    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '
+    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '
     'stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/>'
     '<path d="M12 7.5v9M14.5 9.5c0-1-1-1.5-2.5-1.5s-2.5.6-2.5 1.6c0 2.2 5 1 5 3.2 0 1-1 1.7-2.5 1.7s-2.5-.6-2.5-1.6"/></svg>'
 )
@@ -85,17 +95,17 @@ KPI_DISPLAY = [
 
 EXAMPLE_QUESTIONS = [
     "What are the top 5 vendors by order volume?",
-    "Why did exception rate increase this month?",
+    "What is the estimated borrower savings by month for the past 6 months?",
     "Show SLA compliance by state.",
-    "Which orders are at risk of missing SLA?",
+    "Break down exceptions by exception type this year.",
     "What is the average turnaround time by lender?",
 ]
 
 
 def render_kpi_card(icon_svg: str, label: str, value: str, delta_pct, higher_is_better: bool) -> None:
-    """One KPI card: neutral icon badge, label, big value, and a colored vs.-prior-week trend line."""
+    """One KPI card: neutral icon badge, bold label, a centered big value, and a centered vs.-prior-week trend line."""
     if delta_pct is None:
-        trend_html = f'<div style="font-size:12px;color:{TEXT_TERTIARY};">No prior-week data</div>'
+        trend_html = f'<div style="text-align:center;font-size:13px;color:{TEXT_TERTIARY};">No prior-week data</div>'
     else:
         if delta_pct > 0:
             arrow, favorable = _ARROW_UP, higher_is_better
@@ -105,19 +115,19 @@ def render_kpi_card(icon_svg: str, label: str, value: str, delta_pct, higher_is_
             arrow, favorable = "–", None
         color = TEXT_TERTIARY if favorable is None else (SUCCESS if favorable else DANGER)
         trend_html = (
-            f'<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:{color};font-weight:600;">'
+            f'<div style="display:flex;align-items:center;justify-content:center;gap:5px;font-size:14px;color:{color};font-weight:600;">'
             f'{arrow}{abs(delta_pct):.1f}% <span style="color:{TEXT_TERTIARY};font-weight:400;">vs. prior week</span></div>'
         )
 
     st.markdown(
         f"""
-        <div style="background:{BG_CARD};border:1px solid {BORDER};border-radius:12px;padding:18px 20px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-            <div style="width:38px;height:38px;min-width:38px;border-radius:50%;background:{ICON_BG};
+        <div style="background:{BG_CARD};border:1px solid {BORDER};border-radius:12px;padding:18px 20px;box-shadow:0 4px 16px rgba(79, 111, 168, 0.16);">
+          <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:14px;min-height:46px;">
+            <div style="width:46px;height:46px;min-width:46px;border-radius:50%;background:{ICON_BG};
                         display:flex;align-items:center;justify-content:center;color:{ICON_COLOR};">{icon_svg}</div>
-            <div style="font-size:13px;color:{TEXT_SECONDARY};font-weight:500;">{label}</div>
+            <div style="font-size:{LABEL_FONT_SIZE};color:{TEXT_SECONDARY};font-weight:{KPI_CHART_TITLE_WEIGHT};line-height:1.25;">{label}</div>
           </div>
-          <div style="font-size:28px;font-weight:700;color:{TEXT_PRIMARY};margin-bottom:8px;letter-spacing:-0.01em;">{value}</div>
+          <div style="text-align:center;font-size:30px;font-weight:700;color:{TEXT_PRIMARY};margin-bottom:8px;letter-spacing:-0.01em;">{value}</div>
           {trend_html}
         </div>
         """,
@@ -177,35 +187,70 @@ st.markdown(
     @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
 
     /* One deliberate typeface app-wide, excluding code blocks (need a
-       monospace font), the Material icon glyph (needs its icon font --
-       overriding it would render literal text like "send" instead), and
+       monospace font), Material icon glyphs (need their icon font --
+       overriding it would render literal text like "send" or
+       "calendar_today" instead of the glyph; button icons carry
+       data-testid="stIconMaterial", but icons inside widget labels --
+       e.g. the ":material/calendar_today:" filter labels below -- render
+       instead as a bare role="img" span, so both must be excluded), and
        Plotly charts (they get the same font explicitly via each chart's
        own layout.font in charts.py instead -- a CSS override here would
        swap the rendered font AFTER Plotly has already calculated its
        margins for a different font's character widths, clipping labels
        that render wider than Plotly reserved space for). */
-    [data-testid="stAppViewContainer"] *:not(code):not(pre):not(pre *):not([data-testid="stIconMaterial"]):not([data-testid="stPlotlyChart"] *) {{
+    [data-testid="stAppViewContainer"] *:not(code):not(pre):not(pre *):not([data-testid="stIconMaterial"]):not([role="img"]):not([data-testid="stPlotlyChart"] *) {{
         font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif !important;
     }}
 
     [data-testid="stAppViewContainer"] {{
         background-color: {BG_PAGE};
     }}
-    .st-key-header_card, .st-key-chart_card_1, .st-key-chart_card_2, .st-key-chart_card_3, .st-key-ask_doma_card {{
+    /* Wrap the entire dashboard (everything Streamlit renders) in one
+       bordered, shadowed, rounded box, inset from the browser edges --
+       the whole page reads as a single framed surface. */
+    [data-testid="stMainBlockContainer"] {{
+        background-color: {BG_PAGE};
+        border: 1px solid {BORDER};
+        border-radius: 24px;
+        box-shadow: 0 16px 48px rgba(28, 25, 23, 0.12);
+        margin: 20px;
+    }}
+    .st-key-chart_card_1, .st-key-chart_card_2, .st-key-chart_card_3, .st-key-ask_doma_card {{
         background-color: {BG_CARD} !important;
+        border: 1px solid {BORDER} !important;
+        box-shadow: 0 4px 16px rgba(79, 111, 168, 0.16);
+        border-radius: 14px !important;
+    }}
+    /* Header card: bold gradient hero instead of the flat white card
+       background the other cards use -- deliberately the one bolder
+       moment on the page, everything else stays restrained. */
+    .st-key-header_card {{
+        background: {HEADER_GRADIENT} !important;
         border: 1px solid {BORDER} !important;
         box-shadow: 0 2px 8px rgba(28, 25, 23, 0.08);
         border-radius: 14px !important;
+        overflow: hidden;
     }}
     .st-key-ask_doma_card {{
         padding: 34px 38px !important;
     }}
     .st-key-header_card [data-testid="stSelectbox"] [role="group"],
     .st-key-header_card [data-testid="stDateInputField"] {{
-        background-color: {BG_INPUT} !important;
+        background-color: #FFFFFF !important;
+    }}
+    /* Filter labels (Date Range/Lender/State/Vendor/Property Type): match
+       the KPI card label size so both label rows read at one consistent
+       scale instead of Streamlit's smaller default widget-label size.
+       Light/white here (not TEXT_SECONDARY) since they sit on the dark
+       header gradient -- the Material icon glyphs inherit this via
+       currentColor, so they turn white along with the label text. */
+    .st-key-header_card [data-testid="stWidgetLabel"] p {{
+        font-size: {LABEL_FONT_SIZE} !important;
+        font-weight: 500 !important;
+        color: {HEADER_TEXT_SECONDARY} !important;
     }}
     .st-key-ask_doma_card [data-testid="stCaptionContainer"] p {{
-        font-size: 15px !important;
+        font-size: 16px !important;
     }}
     /* Question input + send button, merged into one pill: the container
        carries the shared background/border, the input itself goes
@@ -226,7 +271,7 @@ st.markdown(
         border: none !important;
         box-shadow: none !important;
         padding-left: 0 !important;
-        font-size: 18px !important;
+        font-size: 19px !important;
     }}
     /* "How this answer was calculated" expander: match the question
        input's fill and font size, so it reads as part of the same section
@@ -237,19 +282,20 @@ st.markdown(
     }}
     .st-key-ask_doma_card [data-testid="stExpander"] summary {{
         background-color: {BG_INPUT} !important;
-        font-size: 17px !important;
+        font-size: 18px !important;
         border-radius: 10px !important;
     }}
     .st-key-ask_doma_card [data-testid="stExpander"] p {{
-        font-size: 17px !important;
+        font-size: 18px !important;
     }}
     button[data-variant="pills"] {{
-        background-color: #F3F6FE !important;
-        border-color: #DCE5FB !important;
+        background-color: {ACCENT_TINT_BG} !important;
+        border-color: {ACCENT_TINT_BORDER} !important;
     }}
     button[data-variant="pills"] span {{
         color: {ACCENT} !important;
         font-weight: 600 !important;
+        font-size: 15px !important;
     }}
     .st-key-ask_send_btn button {{
         border-radius: 50% !important;
@@ -262,6 +308,19 @@ st.markdown(
     }}
     .st-key-ask_send_btn button span {{
         color: #FFFFFF !important;
+    }}
+    /* "Reset all" filter button: quiet outline style (not a filled primary
+       button) -- it's a secondary action sitting right next to the filter
+       inputs, not the same weight as the Ask Doma AI send button. Light
+       outline/text since it sits on the dark header gradient. */
+    .st-key-reset_filters_btn button {{
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.38) !important;
+        color: #FFFFFF !important;
+    }}
+    .st-key-reset_filters_btn button:hover {{
+        border-color: #FFFFFF !important;
+        background-color: rgba(255, 255, 255, 0.16) !important;
     }}
     </style>
     """,
@@ -280,28 +339,66 @@ min_date, max_date = con.execute("SELECT MIN(order_date), MAX(order_date) FROM t
 with st.container(border=True, key="header_card"):
     st.markdown(
         f"""
-        <div style="display:flex; align-items:center; gap:20px; padding:4px 0 16px 0;">
-          <img src="data:image/png;base64,{LOGO_B64}" style="height:40px; width:auto;" alt="doma" />
+        <div style="display:flex; align-items:center; gap:36px; padding:4px 0 16px 0;">
+          <div style="background:#FFFFFF; border-radius:10px; padding:8px 14px; display:flex; align-items:center;">
+            <img src="data:image/png;base64,{LOGO_B64}" style="height:44px; width:auto;" alt="doma" />
+          </div>
           <div>
-            <div style="font-size:32px; font-weight:700; color:{TEXT_PRIMARY}; line-height:1.15; letter-spacing:-0.01em;">Title Operations Insights</div>
-            <div style="font-size:15px; color:{TEXT_SECONDARY};">Ask questions. Get real answers. Powered by your data.</div>
+            <div style="font-size:28px; font-weight:700; color:{HEADER_TEXT_PRIMARY}; line-height:1.15; letter-spacing:-0.01em;">Title Operations Insights</div>
+            <div style="font-size:16px; color:{HEADER_TEXT_SECONDARY};">Monitor performance. Explore trends. Ask the data.</div>
+          </div>
+          <div style="flex:1; position:relative; overflow:hidden; min-height:96px;
+                      display:flex; align-items:center; justify-content:flex-end; padding:12px 28px;">
+            <svg width="118" height="92" viewBox="0 0 130 100" style="position:absolute; right:210px;
+                 bottom:0; opacity:0.28;" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="6" width="5" height="88" rx="2.5" fill="#FFFFFF"/>
+              <rect x="121" y="6" width="5" height="88" rx="2.5" fill="#FFFFFF"/>
+              <ellipse cx="30" cy="90" rx="14" ry="8" fill="#FFFFFF"/>
+              <ellipse cx="96" cy="90" rx="14" ry="8" fill="#FFFFFF"/>
+              <rect x="68" y="48" width="30" height="40" fill="#FFFFFF"/>
+              <polygon points="63,48 83,26 103,48" fill="#FFFFFF"/>
+              <rect x="79" y="58" width="10" height="12" fill="#15213C"/>
+              <rect x="30" y="42" width="46" height="46" fill="#FFFFFF"/>
+              <polygon points="25,42 53,14 81,42" fill="#FFFFFF"/>
+              <rect x="46" y="50" width="14" height="14" fill="#15213C"/>
+              <line x1="53" y1="50" x2="53" y2="64" stroke="#FFFFFF" stroke-width="1.2"/>
+              <line x1="46" y1="57" x2="60" y2="57" stroke="#FFFFFF" stroke-width="1.2"/>
+              <rect x="44" y="70" width="16" height="18" rx="2" fill="#15213C"/>
+              <rect x="78" y="74" width="12" height="12" fill="#15213C"/>
+              <line x1="84" y1="74" x2="84" y2="86" stroke="#FFFFFF" stroke-width="1"/>
+              <line x1="78" y1="80" x2="90" y2="80" stroke="#FFFFFF" stroke-width="1"/>
+            </svg>
+            <div style="text-align:right; font-size:15px; font-weight:600; color:#FFFFFF; line-height:1.6; position:relative; z-index:1;">
+              Faster closings.<br/>Lower costs.<br/>A simpler way home.
+            </div>
           </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    f1, f2, f3, f4, f5 = st.columns(5)
+    def _reset_filters():
+        st.session_state["filter_date"] = (min_date.date(), max_date.date())
+        st.session_state["filter_lender"] = "All Lenders"
+        st.session_state["filter_state"] = "All States"
+        st.session_state["filter_vendor"] = "All Vendors"
+        st.session_state["filter_property_type"] = "All Property Types"
+
+    f1, f2, f3, f4, f5, f6 = st.columns([2, 2, 2, 2, 2, 1.1], vertical_alignment="bottom")
     date_range = f1.date_input(
-        "Date Range",
+        ":material/calendar_today: Date Range",
         value=(min_date.date(), max_date.date()),
         min_value=min_date.date(),
         max_value=max_date.date(),
+        key="filter_date",
     )
-    lender_filter = f2.selectbox("Lender", ["All Lenders"] + lenders)
-    state_filter = f3.selectbox("State", ["All States"] + states)
-    vendor_filter = f4.selectbox("Vendor", ["All Vendors"] + vendors)
-    property_type_filter = f5.selectbox("Property Type", ["All Property Types"] + property_types)
+    lender_filter = f2.selectbox(":material/account_balance: Lender", ["All Lenders"] + lenders, key="filter_lender")
+    state_filter = f3.selectbox(":material/location_on: State", ["All States"] + states, key="filter_state")
+    vendor_filter = f4.selectbox(":material/storefront: Vendor", ["All Vendors"] + vendors, key="filter_vendor")
+    property_type_filter = f5.selectbox(
+        ":material/home_work: Property Type", ["All Property Types"] + property_types, key="filter_property_type"
+    )
+    f6.button(":material/refresh: Reset all", key="reset_filters_btn", on_click=_reset_filters, width="stretch")
 
 # --- Build WHERE clause from filters ---
 # where_sql is built entirely from our own code (never raw user text), so
@@ -359,7 +456,6 @@ def _week_kpis(start, end):
 current_week_kpis = _week_kpis(*current_week)
 prior_week_kpis = _week_kpis(*prior_week)
 
-st.divider()
 kpi_cols = st.columns(6)
 for col, (field, label, icon, fmt, higher_is_better) in zip(kpi_cols, KPI_DISPLAY):
     current_val, prior_val = current_week_kpis[field], prior_week_kpis[field]
@@ -371,16 +467,21 @@ for col, (field, label, icon, fmt, higher_is_better) in zip(kpi_cols, KPI_DISPLA
     with col:
         render_kpi_card(icon, label, fmt(kpi_values[field]), delta_pct, higher_is_better)
 
+# Matches the gap Streamlit's own default block spacing produces between the
+# charts row and the Ask Doma AI card below -- without this, two consecutive
+# st.columns() rows (KPI cards, then charts) sit flush with no gap at all.
+st.markdown("<div style='height:16px;'></div>", unsafe_allow_html=True)
+
+
 def render_chart_title(text: str) -> None:
-    """Chart-card title, sized to fit the smaller chart cards."""
+    """Chart-card title -- matches the KPI card title's font size, weight, and color."""
     st.markdown(
-        f'<div style="font-size:18px; font-weight:600; color:{TEXT_PRIMARY}; margin-bottom:8px; letter-spacing:-0.005em;">{text}</div>',
+        f'<div style="font-size:{LABEL_FONT_SIZE}; font-weight:{KPI_CHART_TITLE_WEIGHT}; color:{TEXT_SECONDARY}; margin-bottom:8px;">{text}</div>',
         unsafe_allow_html=True,
     )
 
 
 # --- Charts + Title Acceptance Eligibility by State (same row) ---
-st.divider()
 c1, c2, c3 = st.columns(3)
 with c1, st.container(border=True, key="chart_card_1"):
     render_chart_title("Order Volume & SLA Compliance")
@@ -393,7 +494,22 @@ with c3, st.container(border=True, key="chart_card_3"):
     state_rows = con.execute(ta_eligibility_by_state_sql(where_sql), params).fetchall()
     state_df = pd.DataFrame(state_rows, columns=["State", "Total Orders", "Title Acceptance Eligible %"])
     state_df["Title Acceptance Eligible %"] = state_df["Title Acceptance Eligible %"].map("{:.2f}%".format)
-    st.dataframe(state_df, width="stretch", hide_index=True, height=charts.DASHBOARD_CARD_HEIGHT)
+    # In-table progress bar for Total Orders only -- scaled to this table's
+    # own max so the bars are relative to each other, not to some fixed
+    # guess. Eligible % stays plain text; it's already a percentage, so a
+    # bar there would just repeat the number, not add information.
+    max_orders = int(state_df["Total Orders"].max()) if not state_df.empty else 1
+    st.dataframe(
+        state_df,
+        width="stretch",
+        hide_index=True,
+        height=charts.DASHBOARD_CARD_HEIGHT,
+        column_config={
+            "Total Orders": st.column_config.ProgressColumn(
+                "Total Orders", format="%d", min_value=0, max_value=max_orders, width=200
+            ),
+        },
+    )
 
 def _apply_example_question():
     picked = st.session_state.get("example_pills")
@@ -470,31 +586,35 @@ def render_how_calculated(result: dict) -> None:
     render_observability(result["observability"])
 
 
-def _escape_dollars(text: str) -> str:
-    """Avoid a literal '$' in LLM-generated prose (e.g. "$513K") being parsed as a LaTeX math delimiter by st.markdown."""
-    return text.replace("$", "\\$")
-
-
 def render_key_insight(explanation: dict) -> None:
     """
     UX Step 6: headline + supporting detail, now sourced directly from the
     model's own structured output (agent.explain_results_with_meta) instead
     of the Step 1 regex split of a single prose string -- the model is
     asked to produce these as distinct fields on purpose.
+
+    No dollar-sign escaping needed here: this text is rendered inside a raw
+    HTML <div> (unsafe_allow_html=True), and Streamlit's markdown-it only
+    runs its math-delimiter ($...$) plugin against plain markdown text, not
+    against content already inside an HTML block -- so "$513K" already
+    renders as a literal dollar sign with no LaTeX misinterpretation.
+    Escaping it here actually broke it: "\\$" only un-escapes back to "$"
+    within plain markdown, not inside HTML, so it showed a literal
+    backslash on screen until this was caught and fixed.
     """
-    headline = _escape_dollars(explanation.get("headline", ""))
-    detail = _escape_dollars(explanation.get("detail", ""))
+    headline = explanation.get("headline", "")
+    detail = explanation.get("detail", "")
 
     st.markdown(
         f"""
         <div style="border-left:3px solid {ACCENT}; padding-left:16px; margin:4px 0 20px 0;">
-          <div style="font-size:11px; font-weight:700; color:{ACCENT}; letter-spacing:0.06em; margin-bottom:6px;">
+          <div style="font-size:12px; font-weight:700; color:{ACCENT}; letter-spacing:0.06em; margin-bottom:6px;">
             KEY INSIGHT
           </div>
-          <div style="font-size:19px; font-weight:700; color:{TEXT_PRIMARY}; margin-bottom:6px; line-height:1.35;">
+          <div style="font-size:20px; font-weight:700; color:{TEXT_PRIMARY}; margin-bottom:6px; line-height:1.35;">
             {headline}
           </div>
-          <div style="font-size:15px; color:{TEXT_BODY}; line-height:1.5;">
+          <div style="font-size:16px; color:{TEXT_BODY}; line-height:1.5;">
             {detail}
           </div>
         </div>
@@ -513,14 +633,14 @@ def render_key_drivers(drivers: list) -> None:
     if not drivers:
         return
     st.markdown(
-        f'<div style="font-size:11px; font-weight:700; color:{TEXT_PRIMARY}; letter-spacing:0.06em; margin:20px 0 10px 0;">KEY DRIVERS</div>',
+        f'<div style="font-size:12px; font-weight:700; color:{TEXT_PRIMARY}; letter-spacing:0.06em; margin:20px 0 10px 0;">KEY DRIVERS</div>',
         unsafe_allow_html=True,
     )
     for i, driver in enumerate(drivers, 1):
         st.markdown(
-            f'<div style="display:flex; gap:10px; margin-bottom:8px;">'
+            f'<div style="display:flex; gap:10px; margin-bottom:8px; font-size:16px;">'
             f'<div style="font-weight:700; color:{ACCENT}; min-width:18px;">{i}.</div>'
-            f'<div style="color:{TEXT_BODY}; line-height:1.5;">{_escape_dollars(driver)}</div>'
+            f'<div style="color:{TEXT_BODY}; line-height:1.5;">{driver}</div>'
             f"</div>",
             unsafe_allow_html=True,
         )
@@ -546,7 +666,7 @@ def render_follow_up_questions(follow_ups: list) -> None:
     if not follow_ups:
         return
     st.markdown(
-        f'<div style="font-size:11px; font-weight:700; color:{TEXT_PRIMARY}; letter-spacing:0.06em; margin:20px 0 10px 0;">EXPLORE FURTHER</div>',
+        f'<div style="font-size:12px; font-weight:700; color:{TEXT_PRIMARY}; letter-spacing:0.06em; margin:20px 0 10px 0;">EXPLORE FURTHER</div>',
         unsafe_allow_html=True,
     )
     st.pills(
@@ -571,6 +691,12 @@ def render_rejected_message(raw_message: str) -> None:
     two-style prompt instruction -- no extra field or second call needed.
     """
     message = raw_message.removeprefix("NO_SQL:").strip()
+    # Unlike render_key_insight/render_key_drivers, st.info/st.warning render
+    # plain markdown (no HTML wrapping) -- so a message that happened to cite
+    # two dollar amounts (e.g. clarifying a cost threshold) really could be
+    # misread as a LaTeX math delimiter here. Escaping is correct in this
+    # one spot, specifically because it's plain markdown, not HTML.
+    message = message.replace("$", "\\$")
     if message.endswith("?"):
         st.info(f"**To answer that, I need a bit more detail:** {message}")
     else:
@@ -578,7 +704,6 @@ def render_rejected_message(raw_message: str) -> None:
 
 
 # --- Ask Doma AI (Phase 6-9: NL -> SQL -> validate -> execute -> explain) ---
-st.divider()
 with st.container(border=True, key="ask_doma_card"):
     st.markdown(
         f"""
