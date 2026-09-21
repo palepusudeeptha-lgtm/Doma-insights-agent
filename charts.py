@@ -8,9 +8,17 @@ from metrics import order_volume_sla_sql, tat_by_decision_sql
 
 # Shared height for the 3 dashboard chart/table cards so they line up evenly
 # in their row regardless of content (2 Plotly figures + 1 st.dataframe).
-# Chosen to be a clean fit for the state table's header + 10 rows (~35px each)
-# so it doesn't show a half-empty trailing row.
-DASHBOARD_CARD_HEIGHT = 385
+# Chosen to be a clean fit for the state table's header + 6 rows (~35px each)
+# so it doesn't show a half-empty trailing row -- the remaining 4 states
+# scroll within the fixed-height table rather than growing the card.
+DASHBOARD_CARD_HEIGHT = 245
+
+# Matches the app-wide CSS font (app.py). Set explicitly on every chart's own
+# layout.font -- rather than relying on the page's CSS to reskin the chart
+# after the fact -- so Plotly calculates its own label/margin sizing against
+# the font it will actually render, instead of clipping a label that renders
+# wider under the CSS-swapped font than Plotly reserved room for.
+CHART_FONT = "IBM Plex Sans, system-ui, sans-serif"
 
 
 def order_volume_sla_chart(con, where_sql: str, params: list):
@@ -34,6 +42,7 @@ def order_volume_sla_chart(con, where_sql: str, params: list):
         legend=dict(orientation="h", y=1.15),
         margin=dict(t=30, b=30),
         height=DASHBOARD_CARD_HEIGHT,
+        font=dict(family=CHART_FONT),
     )
     return fig
 
@@ -56,8 +65,14 @@ def tat_by_decision_chart(con, where_sql: str, params: list):
     )
     fig.update_layout(
         xaxis_title="Avg Turnaround Time (hrs)",
+        # automargin: without it, Plotly's default left margin doesn't
+        # reserve enough room for the longest y-axis label ("Automated
+        # Review") and clips it -- automargin resizes to fit instead of a
+        # fixed guess, which also holds up if a label changes length later.
+        yaxis=dict(automargin=True),
         margin=dict(t=30, b=30),
         height=DASHBOARD_CARD_HEIGHT,
+        font=dict(family=CHART_FONT),
     )
     return fig
 
@@ -158,6 +173,7 @@ def auto_chart(columns: list, rows: list):
             xaxis_title=columns[0],
             yaxis_title=columns[1],
             margin=dict(t=30, b=30),
+            font=dict(family=CHART_FONT),
         )
         return fig
 
@@ -175,11 +191,16 @@ def auto_chart(columns: list, rows: list):
         )
         fig.update_layout(
             xaxis_title=columns[1],
-            # Keep the given row order (already sorted "top N" style by
-            # sort_for_display) reading top-to-bottom instead of Plotly's
-            # default bottom-to-top for bars.
-            yaxis=dict(autorange="reversed"),
+            # autorange="reversed" keeps the given row order (already sorted
+            # "top N" style by sort_for_display) reading top-to-bottom
+            # instead of Plotly's default bottom-to-top for bars.
+            # automargin=True: these labels are arbitrary AI-answer category
+            # names of unpredictable length (a state code, a full vendor
+            # name, an exception type) -- a fixed margin guess would either
+            # clip a long one or waste space on a short one.
+            yaxis=dict(autorange="reversed", automargin=True),
             margin=dict(t=30, b=30),
+            font=dict(family=CHART_FONT),
         )
         return fig
 

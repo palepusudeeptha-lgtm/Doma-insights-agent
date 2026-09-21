@@ -14,6 +14,55 @@ from metrics import METRIC_DEFINITIONS, kpi_summary_sql, ta_eligibility_by_state
 
 LOGO_B64 = base64.b64encode(Path(__file__).parent.joinpath("doma_logo.png").read_bytes()).decode()
 
+# --- Design tokens: warm-neutral palette, one restrained accent (unchanged
+# Doma blue), status colors reserved for real signal (trend arrows only). ---
+BG_PAGE = "#F7F5F1"
+BG_CARD = "#FFFFFF"
+BG_INPUT = "#FAF9F6"  # filters + the question input + the "how calculated" expander
+BORDER = "#E7E2D9"
+TEXT_PRIMARY = "#1C1917"
+TEXT_BODY = "#44403C"
+TEXT_SECONDARY = "#6B6459"
+TEXT_TERTIARY = "#8B8377"
+ACCENT = "#2563EB"
+SUCCESS = "#15803D"
+DANGER = "#B42318"
+ICON_BG = "#F1EDE5"
+ICON_COLOR = "#1C1917"
+
+_ARROW_UP = '<svg width="9" height="9" viewBox="0 0 10 10" fill="currentColor"><path d="M5 1l4 6H1z"/></svg>'
+_ARROW_DOWN = '<svg width="9" height="9" viewBox="0 0 10 10" fill="currentColor"><path d="M5 9L1 3h8z"/></svg>'
+
+# Single-weight line icons (no per-card color) -- replaces the earlier emoji set.
+_ICON_TOTAL_ORDERS = (
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '
+    'stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/>'
+    '<path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></svg>'
+)
+_ICON_SLA = (
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '
+    'stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>'
+)
+_ICON_CLOCK = (
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '
+    'stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>'
+)
+_ICON_GEAR = (
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '
+    'stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/>'
+    '<path d="M12 3.5v2M12 18.5v2M20.5 12h-2M5.5 12h-2M17.8 6.2l-1.4 1.4M7.6 16.4l-1.4 1.4M17.8 17.8l-1.4-1.4M7.6 7.6L6.2 6.2"/></svg>'
+)
+_ICON_ALERT = (
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '
+    'stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5l9 15.5H3l9-15.5z"/><path d="M12 10v3.2"/>'
+    '<circle cx="12" cy="16.6" r="0.9" fill="currentColor" stroke="none"/></svg>'
+)
+_ICON_SAVINGS = (
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" '
+    'stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/>'
+    '<path d="M12 7.5v9M14.5 9.5c0-1-1-1.5-2.5-1.5s-2.5.6-2.5 1.6c0 2.2 5 1 5 3.2 0 1-1 1.7-2.5 1.7s-2.5-.6-2.5-1.6"/></svg>'
+)
+
 KPI_FIELDS = [
     "total_orders",
     "sla_compliance_pct",
@@ -23,15 +72,15 @@ KPI_FIELDS = [
     "estimated_borrower_savings",
 ]
 
-# label, icon, icon background, icon color, value formatter, higher-is-better
-# (for trend color: e.g. a turnaround-time *increase* is bad, so it renders red)
+# label, icon, value formatter, higher-is-better (for trend color: e.g. a
+# turnaround-time *increase* is bad, so it renders red)
 KPI_DISPLAY = [
-    ("total_orders", "Total Orders", "\U0001F4C4", "#EFF6FF", "#2563EB", lambda v: f"{v:,}", True),
-    ("sla_compliance_pct", "SLA Compliance", "✅", "#ECFDF5", "#059669", lambda v: f"{v:.1f}%", True),
-    ("avg_turnaround_hours", "Avg Turnaround Time", "\U0001F550", "#F5F3FF", "#7C3AED", lambda v: f"{v:.1f} hrs", False),
-    ("automation_rate_pct", "Automation Rate", "⚙️", "#EFF6FF", "#2563EB", lambda v: f"{v:.1f}%", True),
-    ("exception_rate_pct", "Exception Rate", "⚠️", "#FEF2F2", "#DC2626", lambda v: f"{v:.1f}%", False),
-    ("estimated_borrower_savings", "Est. Borrower Savings", "\U0001F4B0", "#FFFBEB", "#D97706", lambda v: f"${v / 1_000_000:.1f}M", True),
+    ("total_orders", "Total Orders", _ICON_TOTAL_ORDERS, lambda v: f"{v:,}", True),
+    ("sla_compliance_pct", "SLA Compliance", _ICON_SLA, lambda v: f"{v:.1f}%", True),
+    ("avg_turnaround_hours", "Avg Turnaround Time", _ICON_CLOCK, lambda v: f"{v:.1f} hrs", False),
+    ("automation_rate_pct", "Automation Rate", _ICON_GEAR, lambda v: f"{v:.1f}%", True),
+    ("exception_rate_pct", "Exception Rate", _ICON_ALERT, lambda v: f"{v:.1f}%", False),
+    ("estimated_borrower_savings", "Est. Borrower Savings", _ICON_SAVINGS, lambda v: f"${v / 1_000_000:.1f}M", True),
 ]
 
 EXAMPLE_QUESTIONS = [
@@ -43,32 +92,32 @@ EXAMPLE_QUESTIONS = [
 ]
 
 
-def render_kpi_card(icon: str, icon_bg: str, icon_color: str, label: str, value: str, delta_pct, higher_is_better: bool) -> None:
-    """One KPI card: icon badge, label, big value, and a colored vs.-prior-week trend line."""
+def render_kpi_card(icon_svg: str, label: str, value: str, delta_pct, higher_is_better: bool) -> None:
+    """One KPI card: neutral icon badge, label, big value, and a colored vs.-prior-week trend line."""
     if delta_pct is None:
-        trend_html = '<div style="font-size:12px;color:#9CA3AF;">No prior-week data</div>'
+        trend_html = f'<div style="font-size:12px;color:{TEXT_TERTIARY};">No prior-week data</div>'
     else:
         if delta_pct > 0:
-            arrow, favorable = "▲", higher_is_better
+            arrow, favorable = _ARROW_UP, higher_is_better
         elif delta_pct < 0:
-            arrow, favorable = "▼", not higher_is_better
+            arrow, favorable = _ARROW_DOWN, not higher_is_better
         else:
             arrow, favorable = "–", None
-        color = "#9CA3AF" if favorable is None else ("#059669" if favorable else "#DC2626")
+        color = TEXT_TERTIARY if favorable is None else (SUCCESS if favorable else DANGER)
         trend_html = (
-            f'<div style="font-size:14px;color:{color};font-weight:600;">'
-            f'{arrow} {abs(delta_pct):.1f}% <span style="color:#9CA3AF;font-weight:400;">vs. prior week</span></div>'
+            f'<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:{color};font-weight:600;">'
+            f'{arrow}{abs(delta_pct):.1f}% <span style="color:{TEXT_TERTIARY};font-weight:400;">vs. prior week</span></div>'
         )
 
     st.markdown(
         f"""
-        <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;padding:18px 20px;">
+        <div style="background:{BG_CARD};border:1px solid {BORDER};border-radius:12px;padding:18px 20px;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-            <div style="width:40px;height:40px;min-width:40px;border-radius:50%;background:{icon_bg};
-                        display:flex;align-items:center;justify-content:center;font-size:18px;">{icon}</div>
-            <div style="font-size:14px;color:#4B5563;font-weight:600;">{label}</div>
+            <div style="width:38px;height:38px;min-width:38px;border-radius:50%;background:{ICON_BG};
+                        display:flex;align-items:center;justify-content:center;color:{ICON_COLOR};">{icon_svg}</div>
+            <div style="font-size:13px;color:{TEXT_SECONDARY};font-weight:500;">{label}</div>
           </div>
-          <div style="font-size:30px;font-weight:700;color:#111827;margin-bottom:8px;">{value}</div>
+          <div style="font-size:28px;font-weight:700;color:{TEXT_PRIMARY};margin-bottom:8px;letter-spacing:-0.01em;">{value}</div>
           {trend_html}
         </div>
         """,
@@ -123,61 +172,97 @@ st.set_page_config(page_title="Doma Title Operations Insights", layout="wide")
 # emotion-cache classes) changes across sessions/versions, so it isn't safe to
 # select directly.
 st.markdown(
-    """
+    f"""
     <style>
-    [data-testid="stAppViewContainer"] {
-        background-color: #EFF6FF;
-    }
-    .st-key-header_card, .st-key-chart_card_1, .st-key-chart_card_2, .st-key-chart_card_3, .st-key-ask_doma_card {
-        background-color: #FFFFFF !important;
-        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.10);
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+    /* One deliberate typeface app-wide, excluding code blocks (need a
+       monospace font), the Material icon glyph (needs its icon font --
+       overriding it would render literal text like "send" instead), and
+       Plotly charts (they get the same font explicitly via each chart's
+       own layout.font in charts.py instead -- a CSS override here would
+       swap the rendered font AFTER Plotly has already calculated its
+       margins for a different font's character widths, clipping labels
+       that render wider than Plotly reserved space for). */
+    [data-testid="stAppViewContainer"] *:not(code):not(pre):not(pre *):not([data-testid="stIconMaterial"]):not([data-testid="stPlotlyChart"] *) {{
+        font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif !important;
+    }}
+
+    [data-testid="stAppViewContainer"] {{
+        background-color: {BG_PAGE};
+    }}
+    .st-key-header_card, .st-key-chart_card_1, .st-key-chart_card_2, .st-key-chart_card_3, .st-key-ask_doma_card {{
+        background-color: {BG_CARD} !important;
+        border: 1px solid {BORDER} !important;
+        box-shadow: 0 2px 8px rgba(28, 25, 23, 0.08);
         border-radius: 14px !important;
-    }
+    }}
+    .st-key-ask_doma_card {{
+        padding: 34px 38px !important;
+    }}
     .st-key-header_card [data-testid="stSelectbox"] [role="group"],
-    .st-key-header_card [data-testid="stDateInputField"] {
-        background-color: #FFFFFF !important;
-    }
-    .st-key-ask_doma_card [data-testid="stCaptionContainer"] p {
+    .st-key-header_card [data-testid="stDateInputField"] {{
+        background-color: {BG_INPUT} !important;
+    }}
+    .st-key-ask_doma_card [data-testid="stCaptionContainer"] p {{
         font-size: 15px !important;
-    }
-    .st-key-ask_doma_card input {
-        font-size: 17px !important;
-    }
-    /* "How this was generated" expander: match the question input's look --
-       same light-gray fill and font size, so it reads as part of the same
-       section instead of a visually distinct default Streamlit expander. */
-    .st-key-ask_doma_card [data-testid="stExpander"] {
-        background-color: #F0F2F6 !important;
+    }}
+    /* Question input + send button, merged into one pill: the container
+       carries the shared background/border, the input itself goes
+       transparent so it reads as one control instead of two adjacent ones. */
+    .st-key-ask_input_row {{
+        background-color: {BG_INPUT} !important;
+        border: 1px solid {BORDER} !important;
+        border-radius: 999px !important;
+        padding: 6px 6px 6px 22px !important;
+    }}
+    .st-key-ask_input_row [data-testid="stTextInputRootElement"] {{
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }}
+    .st-key-ask_input_row input {{
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding-left: 0 !important;
+        font-size: 18px !important;
+    }}
+    /* "How this answer was calculated" expander: match the question
+       input's fill and font size, so it reads as part of the same section
+       instead of a visually distinct default Streamlit expander. */
+    .st-key-ask_doma_card [data-testid="stExpander"] {{
+        background-color: {BG_INPUT} !important;
         border-radius: 10px !important;
-    }
-    .st-key-ask_doma_card [data-testid="stExpander"] summary {
-        background-color: #F0F2F6 !important;
+    }}
+    .st-key-ask_doma_card [data-testid="stExpander"] summary {{
+        background-color: {BG_INPUT} !important;
         font-size: 17px !important;
         border-radius: 10px !important;
-    }
-    .st-key-ask_doma_card [data-testid="stExpander"] p {
+    }}
+    .st-key-ask_doma_card [data-testid="stExpander"] p {{
         font-size: 17px !important;
-    }
-    button[data-variant="pills"] {
-        background-color: #EFF6FF !important;
-        border-color: #BFDBFE !important;
-    }
-    button[data-variant="pills"] span {
-        color: #2563EB !important;
+    }}
+    button[data-variant="pills"] {{
+        background-color: #F3F6FE !important;
+        border-color: #DCE5FB !important;
+    }}
+    button[data-variant="pills"] span {{
+        color: {ACCENT} !important;
         font-weight: 600 !important;
-    }
-    .st-key-ask_send_btn button {
+    }}
+    .st-key-ask_send_btn button {{
         border-radius: 50% !important;
-        width: 44px !important;
-        height: 44px !important;
-        min-width: 44px !important;
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
         padding: 0 !important;
-        background-color: #2563EB !important;
-        border-color: #2563EB !important;
-    }
-    .st-key-ask_send_btn button span {
+        background-color: {ACCENT} !important;
+        border-color: {ACCENT} !important;
+    }}
+    .st-key-ask_send_btn button span {{
         color: #FFFFFF !important;
-    }
+    }}
     </style>
     """,
     unsafe_allow_html=True,
@@ -195,11 +280,11 @@ min_date, max_date = con.execute("SELECT MIN(order_date), MAX(order_date) FROM t
 with st.container(border=True, key="header_card"):
     st.markdown(
         f"""
-        <div style="display:flex; align-items:center; gap:24px; padding:4px 0 16px 0;">
-          <img src="data:image/png;base64,{LOGO_B64}" style="height:56px; width:auto;" alt="doma" />
+        <div style="display:flex; align-items:center; gap:20px; padding:4px 0 16px 0;">
+          <img src="data:image/png;base64,{LOGO_B64}" style="height:40px; width:auto;" alt="doma" />
           <div>
-            <div style="font-size:34px; font-weight:700; color:#111827; line-height:1.2;">Title Operations Insights</div>
-            <div style="font-size:15px; color:#6B7280;">Ask questions. Get real answers. Powered by your data.</div>
+            <div style="font-size:32px; font-weight:700; color:{TEXT_PRIMARY}; line-height:1.15; letter-spacing:-0.01em;">Title Operations Insights</div>
+            <div style="font-size:15px; color:{TEXT_SECONDARY};">Ask questions. Get real answers. Powered by your data.</div>
           </div>
         </div>
         """,
@@ -276,7 +361,7 @@ prior_week_kpis = _week_kpis(*prior_week)
 
 st.divider()
 kpi_cols = st.columns(6)
-for col, (field, label, icon, icon_bg, icon_color, fmt, higher_is_better) in zip(kpi_cols, KPI_DISPLAY):
+for col, (field, label, icon, fmt, higher_is_better) in zip(kpi_cols, KPI_DISPLAY):
     current_val, prior_val = current_week_kpis[field], prior_week_kpis[field]
     delta_pct = (
         (current_val - prior_val) / prior_val * 100
@@ -284,12 +369,12 @@ for col, (field, label, icon, icon_bg, icon_color, fmt, higher_is_better) in zip
         else None
     )
     with col:
-        render_kpi_card(icon, icon_bg, icon_color, label, fmt(kpi_values[field]), delta_pct, higher_is_better)
+        render_kpi_card(icon, label, fmt(kpi_values[field]), delta_pct, higher_is_better)
 
 def render_chart_title(text: str) -> None:
-    """Chart-card title, sized to match the Ask Doma AI header (24px/700)."""
+    """Chart-card title, sized to fit the smaller chart cards."""
     st.markdown(
-        f'<div style="font-size:24px; font-weight:700; color:#111827; margin-bottom:8px;">{text}</div>',
+        f'<div style="font-size:18px; font-weight:600; color:{TEXT_PRIMARY}; margin-bottom:8px; letter-spacing:-0.005em;">{text}</div>',
         unsafe_allow_html=True,
     )
 
@@ -402,14 +487,14 @@ def render_key_insight(explanation: dict) -> None:
 
     st.markdown(
         f"""
-        <div style="border-left:3px solid #2563EB; padding-left:16px; margin:4px 0 20px 0;">
-          <div style="font-size:11px; font-weight:700; color:#2563EB; letter-spacing:0.06em; margin-bottom:6px;">
+        <div style="border-left:3px solid {ACCENT}; padding-left:16px; margin:4px 0 20px 0;">
+          <div style="font-size:11px; font-weight:700; color:{ACCENT}; letter-spacing:0.06em; margin-bottom:6px;">
             KEY INSIGHT
           </div>
-          <div style="font-size:19px; font-weight:700; color:#111827; margin-bottom:6px; line-height:1.35;">
+          <div style="font-size:19px; font-weight:700; color:{TEXT_PRIMARY}; margin-bottom:6px; line-height:1.35;">
             {headline}
           </div>
-          <div style="font-size:15px; color:#4B5563; line-height:1.5;">
+          <div style="font-size:15px; color:{TEXT_BODY}; line-height:1.5;">
             {detail}
           </div>
         </div>
@@ -428,14 +513,14 @@ def render_key_drivers(drivers: list) -> None:
     if not drivers:
         return
     st.markdown(
-        '<div style="font-size:11px; font-weight:700; color:#111827; letter-spacing:0.06em; margin:20px 0 10px 0;">KEY DRIVERS</div>',
+        f'<div style="font-size:11px; font-weight:700; color:{TEXT_PRIMARY}; letter-spacing:0.06em; margin:20px 0 10px 0;">KEY DRIVERS</div>',
         unsafe_allow_html=True,
     )
     for i, driver in enumerate(drivers, 1):
         st.markdown(
             f'<div style="display:flex; gap:10px; margin-bottom:8px;">'
-            f'<div style="font-weight:700; color:#2563EB; min-width:18px;">{i}.</div>'
-            f'<div style="color:#374151; line-height:1.5;">{_escape_dollars(driver)}</div>'
+            f'<div style="font-weight:700; color:{ACCENT}; min-width:18px;">{i}.</div>'
+            f'<div style="color:{TEXT_BODY}; line-height:1.5;">{_escape_dollars(driver)}</div>'
             f"</div>",
             unsafe_allow_html=True,
         )
@@ -461,7 +546,7 @@ def render_follow_up_questions(follow_ups: list) -> None:
     if not follow_ups:
         return
     st.markdown(
-        '<div style="font-size:11px; font-weight:700; color:#111827; letter-spacing:0.06em; margin:20px 0 10px 0;">EXPLORE FURTHER</div>',
+        f'<div style="font-size:11px; font-weight:700; color:{TEXT_PRIMARY}; letter-spacing:0.06em; margin:20px 0 10px 0;">EXPLORE FURTHER</div>',
         unsafe_allow_html=True,
     )
     st.pills(
@@ -496,14 +581,12 @@ def render_rejected_message(raw_message: str) -> None:
 st.divider()
 with st.container(border=True, key="ask_doma_card"):
     st.markdown(
-        """
+        f"""
         <div style="display:flex; align-items:center; gap:10px;">
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="#2563EB" xmlns="http://www.w3.org/2000/svg">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="{ACCENT}" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 2C12.5 7 14.5 9.5 20 10C14.5 10.5 12.5 13 12 18C11.5 13 9.5 10.5 4 10C9.5 9.5 11.5 7 12 2Z"/>
           </svg>
-          <span style="font-size:24px; font-weight:700; color:#111827;">Ask Doma AI</span>
-          <span style="background:#EFF6FF; color:#2563EB; font-size:11px; font-weight:700;
-                       padding:2px 10px; border-radius:999px;">BETA</span>
+          <span style="font-size:28px; font-weight:700; color:{TEXT_PRIMARY};">Ask Doma AI</span>
         </div>
         """,
         unsafe_allow_html=True,
@@ -514,16 +597,17 @@ with st.container(border=True, key="ask_doma_card"):
         "Verify important business decisions against governed reporting."
     )
 
-    input_col, send_col = st.columns([20, 1.3], vertical_alignment="bottom")
-    with input_col:
-        question = st.text_input(
-            "Ask about title operations",
-            placeholder="Ask a question about your data...",
-            label_visibility="collapsed",
-            key="question_input",
-        )
-    with send_col:
-        send_clicked = st.button("", icon=":material/send:", key="ask_send_btn", type="primary")
+    with st.container(key="ask_input_row"):
+        input_col, send_col = st.columns([20, 1.4], vertical_alignment="center")
+        with input_col:
+            question = st.text_input(
+                "Ask about title operations",
+                placeholder="Ask a question about your data...",
+                label_visibility="collapsed",
+                key="question_input",
+            )
+        with send_col:
+            send_clicked = st.button("", icon=":material/send:", key="ask_send_btn", type="primary")
 
     st.pills(
         "Example questions",
